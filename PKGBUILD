@@ -1,0 +1,37 @@
+# Maintainer: William Giokas <1007380@gmail.com>
+
+pkgname=dwmstatus-ks-git
+_pkgname=dwmstatus-ks
+pkgver=0.5.0.r19.g33cc9b9
+pkgrel=3
+pkgdesc="A simple C status bar, fork by KaiSforza, git version"
+url="https://bitbucket.org/KaiSforza/dwmstatus"
+arch=('i686' 'x86_64')
+license=('MIT')
+options=(zipman)
+makedepends=('git' 'pacman>4.0.3')
+provides=('dwmstatus')
+conflicts=('dwmstatus')
+source=('dwmstatus-ks::git+git://github.com/KaiSforza/dwmstatus#branch=noleaks'
+        'config.h')
+md5sums=('SKIP'
+         'cb9e8c061bbe89edd8b907af62469312')
+
+pkgver() {
+  cd "$srcdir/$_pkgname"
+  git describe --always --long | sed -E 's/v//;s/([^-]*-g)/r\1/;s/-/./g'
+}
+prepare() {
+  cp "$srcdir/config.h" "$srcdir/$_pkgname"
+  sed -i "s/VERSION = .*/VERSION = ${pkgver}-${pkgrel}/g" ${srcdir}/${_pkgname}/config.mk
+}
+build() {
+  cd "$srcdir/$_pkgname"
+  make PREFIX=/usr
+}
+package() {
+  cd "$srcdir/$_pkgname"
+  make PREFIX=/usr DESTDIR=$pkgdir install
+}
+
+# vim:set ts=2 sw=2 et:
